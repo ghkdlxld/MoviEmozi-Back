@@ -3,7 +3,8 @@ from . import views
 
 urlpatterns = [
     path('',views.movie_list),
-    path('boxoffice/', views.boxoffice_list),
+    path('box_office/', views.box_office_list),
     path('shortment/', views.shortment_list_create),
     path('<int:movie_pk>/like/', views.movie_like),
+    path('movie_data_update/', views.movie_data_update), # api 요청보내는 url
 ]

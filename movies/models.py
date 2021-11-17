@@ -1,19 +1,20 @@
 from django.db import models
 from django.conf import settings
 
-
-# Create your models here.
 class Movie(models.Model):
     title = models.CharField(max_length=100)
     overview = models.TextField(blank=True)
-    release_date = models.DateTimeField(blank=True)
+    release_date = models.DateField(blank=True)
     poster_path = models.TextField(blank=True)
     popularity = models.FloatField()
-    video = models.CharField(max_length=500)
-    genres = models.CharField(max_length=50)
+    video_id = models.CharField(max_length=500)
+    genres = models.CharField(max_length=100, blank=True)
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_movies')
-    audience = models.CharField(max_length=100)
     runtime = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.title
+    
 
 
 class Shortment(models.Model):
@@ -22,5 +23,9 @@ class Shortment(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add = True)
     updated_at = models.DateTimeField(auto_now = True)
+
+    def __str__(self):
+        return self.content
+    
 
 
