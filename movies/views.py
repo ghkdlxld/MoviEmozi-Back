@@ -29,27 +29,26 @@ def movie_data_update(request):
                 
                 url = f'https://api.themoviedb.org/3/movie/{num}?api_key={TMDB_api_key}&language=ko-KR'
                 data = requests.get(url).json()
-                # title = data['title']
-                # overview = data['overiew']
-                # release_date = data['release_date']
-                # poster_path = data['poster_path']
-                # popularity = data['popularity']
-                # genres = data['genres'][0]['name']
-                # runtime = data['runtime']
+                title = data['title']
+                overview = data['overview']
+                release_date = data['release_date']
+                poster_path = data['poster_path']
+                popularity = data['popularity']
+                runtime = data['runtime']
                 genre_list = data['genres']
                 genres = []
                 for genre in genre_list:
                     genres.append(genre['name'])
 
                 Movie.objects.create(
-                    title = data['title'],
-                    overview = data['overview'],
-                    release_date = data['release_date'],
-                    poster_path = data['poster_path'],
-                    popularity = data['popularity'],
+                    title = title,
+                    overview = overview,
+                    release_date = release_date,
+                    poster_path = poster_path,
+                    popularity = popularity,
                     video_id = video_id,
                     genres = genres,
-                    runtime = data['runtime'],
+                    runtime = runtime,
                 )
             else:
                 pass
