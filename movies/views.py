@@ -22,36 +22,37 @@ def movie_data_update(request):
     nums = range(1,100)
     for num in nums:
         try:
-            url = f'https://api.themoviedb.org/3/movie/{num}?api_key={TMDB_api_key}&language=ko-KR'
-            data = requests.get(url).json()
             video_url = f'https://api.themoviedb.org/3/movie/{num}/videos?api_key={TMDB_api_key}&language=ko-KR'
-            title = data['title']
-            overview = data['overiew']
-            release_date = data['release_date']
-            poster_path = data['poster_path']
-            popularity = data['popularity']
             video = requests.get(video_url).json()
-            pprint.pprint(video)
-            if video:
-                video_id = video[0]['key']     # 추후 vue의 iframe api 요청보낼때의 video_id 값
-            # genre_list = data['genres']
-            # genres = []
-            # for genre in genre_list:
-            #     genres.append(genre['name'])
-                pprint.pprint(video_id)
-                genres = data['genres'][0]['name']
-                runtime = data['runtime']
+            if video['results']:
+                video_id = video['results'][0]['key']     # 추후 vue의 iframe api 요청보낼때의 video_id 값
+                
+                url = f'https://api.themoviedb.org/3/movie/{num}?api_key={TMDB_api_key}&language=ko-KR'
+                data = requests.get(url).json()
+                # title = data['title']
+                # overview = data['overiew']
+                # release_date = data['release_date']
+                # poster_path = data['poster_path']
+                # popularity = data['popularity']
+                # genres = data['genres'][0]['name']
+                # runtime = data['runtime']
+                genre_list = data['genres']
+                genres = []
+                for genre in genre_list:
+                    genres.append(genre['name'])
+
                 Movie.objects.create(
-                    title = title,
-                    overview = overview,
-                    release_date = release_date,
-                    poster_path = poster_path,
-                    popularity = popularity,
+                    title = data['title'],
+                    overview = data['overview'],
+                    release_date = data['release_date'],
+                    poster_path = data['poster_path'],
+                    popularity = data['popularity'],
                     video_id = video_id,
                     genres = genres,
-                    runtime = runtime
+                    runtime = data['runtime'],
                 )
-                return JsonResponse({'title':title})
+            else:
+                pass
         except:
             pass
     return JsonResponse(data)
