@@ -9,20 +9,17 @@ class Movie(models.Model):
     release_date = models.DateTimeField(blank=True)
     poster_path = models.TextField(blank=True)
     popularity = models.FloatField()
-    vote_average = models.FloatField()
     video = models.CharField(max_length=500)
     genres = models.CharField(max_length=50)
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_movies')
-    # 누적관객..?
-
-
+    audience = models.CharField(max_length=100)
+    runtime = models.CharField(max_length=50)
 
 
 class Shortment(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     content = models.TextField()
-    vote_rate = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add = True)
     updated_at = models.DateTimeField(auto_now = True)
 
