@@ -30,7 +30,15 @@ def shortment_list_create(request,movie_pk):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 def movie_like(request, movie_pk):
-    pass
+    if request.user.is_authenticated:
+        movie = get_object_or_404(Movie, pk=movie_pk)
+        user = request.user
+        if movie.like_users.filter(pk=user.pk).exists():
+            movie.like_users.remove(user)
+        else:
+            movie.like_users.add(user)
+        return Response(status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 def movie_data_update(request):
     TMDB_api_key='325094f1219be8e028e6413f560bf212'
