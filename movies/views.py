@@ -19,7 +19,7 @@ def movie_like(request):
 
 def movie_data_update(request):
     TMDB_api_key='325094f1219be8e028e6413f560bf212'
-    nums = range(1,100)
+    nums = range(1,10000)
     for num in nums:
         try:
             video_url = f'https://api.themoviedb.org/3/movie/{num}/videos?api_key={TMDB_api_key}&language=ko-KR'

@@ -12,27 +12,38 @@ class ReviewSerializers(serializers.ModelSerializer):
         model = Review
         fields = '__all__'
 
-class ReviewCommnetSerializers(serializers.ModelSerializer):
+class ReviewCommentListSerializers(serializers.ModelSerializer):
     
     class Meta:
         model = Review_comment
         fields = ('content','user','updated_at')
 
+class ReviewCommentSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Review_comment
+        fields = '__all__'
+
 class ChatboardListSerializers(serializers.ModelSerializer):
     class Meta:
         model = Chatboard
-        fields=('title','user','updated_at')
+        fields=('title','user','updated_at','board_num')
 
 class ChatboardSerializers(serializers.ModelSerializer):
     class Meta:
         model = Chatboard
         fields = '__all__'
 
-class ChatboardCommnetSerializers(serializers.ModelSerializer):
+class ChatboardCommentListSerializers(serializers.ModelSerializer):
     
     class Meta:
         model = Chatboard_comment
         fields = ('content','user','updated_at')
+
+class ChatboardCommentSerializers(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Chatboard_comment
+        fields = '__all__'
 
 
     

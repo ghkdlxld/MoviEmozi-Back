@@ -16,6 +16,13 @@ class Review(models.Model):
     
 
 class Chatboard(models.Model):
+    BOARD_CHOICES = [
+        ('1', '자유'),
+        ('2','건의'),
+        ('3', '영화 추천'),
+        ('4','파티 모집'),
+    ]
+    board_num = models.CharField(max_length=50, choices=BOARD_CHOICES, default='1') 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     content = models.TextField()
