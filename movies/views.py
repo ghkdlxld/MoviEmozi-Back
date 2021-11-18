@@ -2,16 +2,34 @@ from django.shortcuts import render
 import requests
 import json
 import pprint
-from .models import Movie
+
+from movies import serializers
+from .models import Movie, Shortment
 from django.http import JsonResponse
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from rest_framework import status
 
+@api_view(['GET'])
 def movie_list(request):
-    pass
+    movies = Movie.objects.all()
+    serializer = serializers.MovieListSerializers(movies, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
+@api_view(['GET','POST'])
 def shortment_list_create(request):
-    pass
+    if request.method == 'GET':
+        shortments = Shortment.objects.all()
+        serializer = serializers.ShortmentListSerializers(shortments, many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    else:
+        serializer = serializers.ShortmentSerializers(data=request.data)
+        
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(user=request.user.id)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-def movie_like(request):
+def movie_like(request, movie_pk):
     pass
 
 def movie_data_update(request):
