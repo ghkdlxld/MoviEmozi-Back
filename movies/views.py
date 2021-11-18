@@ -8,9 +8,6 @@ from django.http import JsonResponse
 def movie_list(request):
     pass
 
-def box_office_list(request):
-    pass
-
 def shortment_list_create(request):
     pass
 
