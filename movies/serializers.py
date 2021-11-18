@@ -1,4 +1,3 @@
-import re
 from rest_framework import serializers
 from .models import Movie,Shortment
 
@@ -19,8 +18,8 @@ class ShortmentListSerializers(serializers.ModelSerializer):
         fields = '__all__'
 
 class ShortmentSerializers(serializers.ModelSerializer):
-    movie_id = serializers.CharField(read_only=True)
+    movie= serializers.CharField(read_only=True)
 
     class Meta:
         model = Shortment
-        fields = ('id','content','movie_id',)
+        fields = ('id','content','movie')

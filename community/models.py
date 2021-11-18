@@ -22,7 +22,7 @@ class Chatboard(models.Model):
         ('3', '영화 추천'),
         ('4','파티 모집'),
     ]
-    board_num = models.CharField(max_length=50, choices=BOARD_CHOICES, default='1') 
+    board_num = models.CharField(max_length=50, choices=BOARD_CHOICES) 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     content = models.TextField()
