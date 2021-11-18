@@ -19,24 +19,8 @@ class ShortmentListSerializers(serializers.ModelSerializer):
         fields = '__all__'
 
 class ShortmentSerializers(serializers.ModelSerializer):
-    
-    # class MovieSerializers(serializers.ModelSerializer):
-    #     class Meta:
-    #         model = Movie
-    #         fields= ('pk','title',)
-
-    user = serializers.CharField(read_only=True)
-    movie = MovieSerializers(many=True, read_only=True)
-
-    # movie_pk = serializers.IntegerField(write_only=True)
-
-    def create(self, validated_data):
-        movie_pk = validated_data.pop('movie_pk')
-        ment = Shortment.objects.create(**validated_data)
-        ment.movie.add(movie_pk)
-        return ment
-
+    movie_id = serializers.CharField(read_only=True)
 
     class Meta:
         model = Shortment
-        fields = ('id','content','user','movie','movie_pk')
+        fields = ('id','content','movie_id',)

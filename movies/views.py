@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render , get_list_or_404
 import requests
 import json
 import pprint
@@ -14,19 +14,19 @@ from rest_framework import status
 def movie_list(request):
     movies = Movie.objects.all()
     serializer = serializers.MovieListSerializers(movies, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.data)
 
 @api_view(['GET','POST'])
-def shortment_list_create(request):
+def shortment_list_create(request,movie_pk):
     if request.method == 'GET':
-        shortments = Shortment.objects.all()
+        shortments = get_list_or_404(Shortment,movie=movie_pk)
         serializer = serializers.ShortmentListSerializers(shortments, many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
     else:
         serializer = serializers.ShortmentSerializers(data=request.data)
         
         if serializer.is_valid(raise_exception=True):
-            serializer.save(user=request.user.id)
+            serializer.save(user=request.user, movie_id = movie_pk)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 def movie_like(request, movie_pk):
