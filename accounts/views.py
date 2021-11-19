@@ -1,14 +1,17 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_list_or_404, get_object_or_404, redirect, render
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import serializers, status
 
 from accounts.serializers import UserSerializer, UserListSerializer
 
+@api_view(['POST'])
+@permission_classes([AllowAny])
 def signup(request):
     password = request.data.get('password')
-    password_confirmation = request.data.get('password_confirmation')
+    password_confirmation = request.data.get('passwordConfirm')
     if password != password_confirmation:
         return Response({'error':'비밀번호가 일치하지 않습니다'}, status=status.HTTP_400_BAD_REQUEST)
     
