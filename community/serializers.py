@@ -5,7 +5,7 @@ class ReviewListSerializers(serializers.ModelSerializer):
     
     class Meta:
         model = Review
-        fields = ('title','user','updated_at')
+        fields = ('id','title','user','updated_at','movie_id')
 
 class ReviewSerializers(serializers.ModelSerializer):
     movie = serializers.CharField(read_only=True)
@@ -20,7 +20,7 @@ class ReviewCommentListSerializers(serializers.ModelSerializer):
     
     class Meta:
         model = Review_comment
-        fields = ('content','user','updated_at')
+        fields = ('id','content','user','updated_at')
 
 class ReviewCommentSerializers(serializers.ModelSerializer):
     review = serializers.CharField(read_only=True)
@@ -33,7 +33,7 @@ class ReviewCommentSerializers(serializers.ModelSerializer):
 class ChatboardListSerializers(serializers.ModelSerializer):
     class Meta:
         model = Chatboard
-        fields=('title','user','updated_at','board_num')
+        fields=('id','title','user','updated_at','board_num')
 
 class ChatboardSerializers(serializers.ModelSerializer):
     user = serializers.CharField(read_only=True)
@@ -47,7 +47,7 @@ class ChatboardCommentListSerializers(serializers.ModelSerializer):
     
     class Meta:
         model = Chatboard_comment
-        fields = ('content','user','updated_at')
+        fields = ('id','content','user','updated_at')
 
 class ChatboardCommentSerializers(serializers.ModelSerializer):
     chatboard = serializers.CharField(read_only=True)

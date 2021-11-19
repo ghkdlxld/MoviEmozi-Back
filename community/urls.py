@@ -2,6 +2,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    # 전체 리뷰 목록
+    path('reviews/',views.reviews_list),
     # 리뷰 목록 + 작성
     path('<int:movie_pk>/reviews/', views.reviews_list_create),
     # 단일 리뷰 detail + 수정 + 삭제
@@ -16,7 +18,7 @@ urlpatterns = [
     path('<int:review_pk>/review_like/', views.review_like),
 
     # 게시판 글 목록 + 작성 
-    path('<int:board_num>/chats/', views.chats_list_create),
+    path('chats/', views.chats_list_create),
     # 단일 게시판 글 detail + 수정 + 삭제
     path('<int:chatboard_pk>/chat_detail/', views.chat_detail),
     # 게시글 댓글 목록 + 작성 

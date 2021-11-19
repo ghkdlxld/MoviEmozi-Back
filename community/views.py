@@ -6,6 +6,12 @@ from rest_framework.response import Response
 from .models import Review_comment,Review,Chatboard,Chatboard_comment
 from rest_framework.decorators import api_view
 
+@api_view(['GET'])
+def reviews_list(request):
+    reviews = Review.objects.all()
+    serializer = serializers.ReviewListSerializers(reviews,many=True)
+    return Response(serializer.data,status=status.HTTP_200_OK)
+
 @api_view(['GET','POST'])
 def reviews_list_create(request,movie_pk):
     if request.method == 'GET':
@@ -77,9 +83,9 @@ def review_like(request, review_pk):
     return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['GET','POST'])
-def chats_list_create(request,board_num):
+def chats_list_create(request):
     if request.method == 'GET':
-        chats = get_list_or_404(Chatboard,board_num = board_num)
+        chats = get_list_or_404(Chatboard)
         serializer = serializers.ChatboardListSerializers(chats, many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
     else:
