@@ -23,12 +23,17 @@ def shortment_list_create(request,movie_pk):
         serializer = serializers.ShortmentListSerializers(shortments, many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
     else:
-        serializer = serializers.ShortmentSerializers(data=request.data)
-        
-        if serializer.is_valid(raise_exception=True):
-            serializer.save(user=request.user, movie_id = movie_pk)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if request.user.is_authenticated:
+            serializer = serializers.ShortmentSerializers(data=request.data)
+            
+            if serializer.is_valid(raise_exception=True):
+                serializer.save(user=request.user, movie_id = movie_pk)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
+
+@api_view(['POST'])
 def movie_like(request, movie_pk):
     if request.user.is_authenticated:
         movie = get_object_or_404(Movie, pk=movie_pk)
