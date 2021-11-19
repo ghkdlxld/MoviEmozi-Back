@@ -4,9 +4,11 @@ from community import serializers
 from rest_framework import status
 from rest_framework.response import Response
 from .models import Review_comment,Review,Chatboard,Chatboard_comment
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
+from rest_framework.permissions import AllowAny
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def reviews_list(request):
     reviews = Review.objects.all()
     serializer = serializers.ReviewListSerializers(reviews,many=True)
@@ -82,17 +84,22 @@ def review_like(request, review_pk):
         return Response(status=status.HTTP_200_OK)
     return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-@api_view(['GET','POST'])
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def chats_list(request):
+    chats = get_list_or_404(Chatboard)
+    serializer = serializers.ChatboardListSerializers(chats, many=True)
+    return Response(serializer.data,status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
 def chats_list_create(request):
-    if request.method == 'GET':
-        chats = get_list_or_404(Chatboard)
-        serializer = serializers.ChatboardListSerializers(chats, many=True)
-        return Response(serializer.data,status=status.HTTP_200_OK)
-    else:
-        serializer = serializers.ChatboardSerializers(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save(user=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    serializer = serializers.ChatboardSerializers(data=request.data)
+    if serializer.is_valid(raise_exception=True):
+        serializer.save(user=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 @api_view(['GET','PUT','DELETE'])
 def chat_detail(request, chatboard_pk):

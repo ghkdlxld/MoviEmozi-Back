@@ -3,34 +3,40 @@ import requests
 import json
 import pprint
 
+from rest_framework.permissions import AllowAny
+
 from movies import serializers
 from .models import Movie, Shortment
 from django.http import JsonResponse
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
 from rest_framework import status
 
+
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def movie_list(request):
     movies = Movie.objects.all()
     serializer = serializers.MovieListSerializers(movies, many=True)
     return Response(serializer.data)
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def shortment_list(request,movie_pk):
+    shortments = get_list_or_404(Shortment,movie=movie_pk)
+    serializer = serializers.ShortmentListSerializers(shortments, many=True)
+    return Response(serializer.data,status=status.HTTP_200_OK)
+
 @api_view(['GET','POST'])
 def shortment_list_create(request,movie_pk):
-    if request.method == 'GET':
-        shortments = get_list_or_404(Shortment,movie=movie_pk)
-        serializer = serializers.ShortmentListSerializers(shortments, many=True)
-        return Response(serializer.data,status=status.HTTP_200_OK)
+    if request.user.is_authenticated:
+        serializer = serializers.ShortmentSerializers(data=request.data)
+        
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(user=request.user, movie_id = movie_pk)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
     else:
-        if request.user.is_authenticated:
-            serializer = serializers.ShortmentSerializers(data=request.data)
-            
-            if serializer.is_valid(raise_exception=True):
-                serializer.save(user=request.user, movie_id = movie_pk)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['POST'])

@@ -17,6 +17,8 @@ urlpatterns = [
     # 리뷰 좋아요
     path('<int:review_pk>/review_like/', views.review_like),
 
+    # 전체 게시판 목록 
+    path('chats_list/', views.chats_list),
     # 게시판 글 목록 + 작성 
     path('chats/', views.chats_list_create),
     # 단일 게시판 글 detail + 수정 + 삭제
