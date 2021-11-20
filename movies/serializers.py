@@ -15,7 +15,8 @@ class ShortmentListSerializers(serializers.ModelSerializer):
 
 class ShortmentSerializers(serializers.ModelSerializer):
     movie= serializers.CharField(read_only=True)
-
+    user = serializers.CharField(read_only=True)
+    
     class Meta:
         model = Shortment
-        fields = ('id','content','movie')
+        fields = ('id','content','movie', 'updated_at', 'created_at', 'user',)
