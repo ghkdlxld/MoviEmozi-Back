@@ -33,6 +33,7 @@ def follow(request, user_pk):
     return Response({'error':'인증되지 않은 사용자입니다'}, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def user_list(request):
     person = get_user_model().objects.all()
     serializer = UserListSerializer(person, many=True)
