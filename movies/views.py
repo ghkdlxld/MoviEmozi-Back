@@ -39,6 +39,26 @@ def shortment_list_create(request,movie_pk):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
+
+@api_view(['PUT','DELETE'])
+def shortment_update_delete(request, shortment_pk):
+    shortment = get_object_or_404(Shortment, pk=shortment_pk)
+    if request.method == 'PUT':
+        serializer = serializers.ShortmentSerializers(instance=shortment,data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+    elif request.method == 'DELETE':
+        shortment.delete()
+        data = {
+            'delete' : f'한줄평 {shortment_pk} 번이 삭제되었습니다'
+        }
+        return Response(data, status=status.HTTP_204_NO_CONTENT)
+
+
+
+
 @api_view(['POST'])
 def movie_like(request, movie_pk):
     if request.user.is_authenticated:
