@@ -23,9 +23,11 @@ def movie_list(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def shortment_list(request,movie_pk):
-    shortments = get_list_or_404(Shortment,movie=movie_pk)
+    shortments = Shortment.objects.all().filter(movie=movie_pk)
     serializer = serializers.ShortmentListSerializers(shortments, many=True)
-    return Response(serializer.data,status=status.HTTP_200_OK)
+    if shortments:
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['GET','POST'])
 def shortment_list_create(request,movie_pk):
@@ -37,6 +39,26 @@ def shortment_list_create(request,movie_pk):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
     else:
         return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
+
+@api_view(['PUT','DELETE'])
+def shortment_update_delete(request, shortment_pk):
+    shortment = get_object_or_404(Shortment, pk=shortment_pk)
+    if request.method == 'PUT':
+        serializer = serializers.ShortmentSerializers(instance=shortment,data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+    elif request.method == 'DELETE':
+        shortment.delete()
+        data = {
+            'delete' : f'한줄평 {shortment_pk} 번이 삭제되었습니다'
+        }
+        return Response(data, status=status.HTTP_204_NO_CONTENT)
+
+
 
 
 @api_view(['POST'])
