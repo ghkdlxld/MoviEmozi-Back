@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.db.models.fields import CharField
 
 class Movie(models.Model):
     title = models.CharField(max_length=100)
@@ -28,4 +29,7 @@ class Shortment(models.Model):
         return self.content
     
 
-
+class Rank(models.Model):
+    movie = models.IntegerField()
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    rank = models.IntegerField(default=0)
