@@ -6,7 +6,7 @@ import pprint
 from rest_framework.permissions import AllowAny
 
 from movies import serializers
-from .models import Movie, Shortment
+from .models import Movie, Shortment,Rank
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view,permission_classes
@@ -59,6 +59,42 @@ def shortment_update_delete(request, shortment_pk):
         return Response(data, status=status.HTTP_204_NO_CONTENT)
 
 
+@api_view(['GET', 'POST'])
+def movie_rank(request, movie_pk):
+    if request.method == 'GET':
+        rank = Rank.objects.all().filter(movie=movie_pk)
+        if rank:
+            serializer = serializers.RankListSerializers(rank, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response([], status=status.HTTP_204_NO_CONTENT)
+    else:
+        serializer = serializers.RankListSerializers(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(user=request.user, movie=movie_pk)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+
+@api_view(['PUT','DELETE'])
+def rank_update_delete(request, rank_pk):
+    rank = get_object_or_404(Rank, pk=rank_pk)
+    if request.method == 'PUT':
+        serializer = serializers.RankListSerializers(instance=rank, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+    elif request.method == 'DELETE':
+        rank.delete()
+        data = {
+            'delete' : f'평점 {rank_pk} 번이 삭제되었습니다'
+        }
+        return Response(data, status=status.HTTP_204_NO_CONTENT)
+
+
+
+
 
 
 @api_view(['POST'])
@@ -72,6 +108,8 @@ def movie_like(request, movie_pk):
             movie.like_users.add(user)
         return Response(status=status.HTTP_200_OK)
     return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
 
 def movie_data_update(request):
     TMDB_api_key='325094f1219be8e028e6413f560bf212'
