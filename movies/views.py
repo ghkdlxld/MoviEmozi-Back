@@ -23,9 +23,11 @@ def movie_list(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def shortment_list(request,movie_pk):
-    shortments = get_list_or_404(Shortment,movie=movie_pk)
+    shortments = Shortment.objects.all().filter(movie=movie_pk)
     serializer = serializers.ShortmentListSerializers(shortments, many=True)
-    return Response(serializer.data,status=status.HTTP_200_OK)
+    if shortments:
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['GET','POST'])
 def shortment_list_create(request,movie_pk):
