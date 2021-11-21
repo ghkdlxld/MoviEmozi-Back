@@ -5,12 +5,13 @@ class ReviewListSerializers(serializers.ModelSerializer):
     
     class Meta:
         model = Review
-        fields = ('id','title','user','updated_at','movie_id','created_at')
+        fields = ('id','title','user','updated_at','movie_id','created_at',)
 
 class ReviewSerializers(serializers.ModelSerializer):
     movie = serializers.CharField(read_only=True)
     user = serializers.CharField(read_only=True)
     review_like = serializers.CharField(read_only=True)
+    board_num = serializers.CharField(read_only=True)
     
     class Meta:
         model = Review

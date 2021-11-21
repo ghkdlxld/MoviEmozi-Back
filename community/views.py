@@ -1,3 +1,4 @@
+from django.http.response import JsonResponse
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from requests.models import to_native_string
 from community import serializers
@@ -73,15 +74,22 @@ def review_comments_detail(request,review_comment_pk):
     serializer = serializers.ReviewCommentSerializers(comment)
     return Response(serializer.data)
 
-
+@api_view(['POST'])
 def review_like(request, review_pk):
     if request.user.is_authenticated:
         review = get_object_or_404(Review,pk=review_pk)
-        if review.like_users.filter(pk=request.user.pk).exists():
-            review.like_users.remove(request.user)
+        if review.review_like.filter(pk=request.user.pk).exists():
+            review.review_like.remove(request.user)
+            liked = False
         else:
-            review.like_users.add(request.user)
-        return Response(status=status.HTTP_200_OK)
+            review.review_like.add(request.user)
+            liked = True
+
+        context={
+            'liked': liked,
+            'count':review.review_like.count(),
+        }
+        return Response(context, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
