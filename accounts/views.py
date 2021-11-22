@@ -4,23 +4,24 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import serializers, status
+from .models import User
 
 from accounts.serializers import UserSerializer, UserListSerializer
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def signup(request):
-    password = request.data.get('password')
-    password_confirmation = request.data.get('passwordConfirm')
-    if password != password_confirmation:
-        return Response({'error':'비밀번호가 일치하지 않습니다'}, status=status.HTTP_400_BAD_REQUEST)
-    
-    serializer = UserSerializer(data=request.data)
-    if serializer.is_valid(raise_exception=True):
-        user = serializer.save()
-        user.set_password(request.data.get('password'))
-        user.save()
-        return Response(serializer.data,status=status.HTTP_201_CREATED)
+    name = request.data.get('username')
+    users = User.objects.all()
+    if name in users:
+        return Response({'error':'이미 존재하는 이름 입니다.'},status=status.HTTP_409_CONFLICT)
+    else:
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            user = serializer.save()
+            user.set_password(request.data.get('password'))
+            user.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
 
 def follow(request, user_pk):
     if request.user.is_authenticated:
@@ -36,5 +37,11 @@ def follow(request, user_pk):
 @permission_classes([AllowAny])
 def user_list(request):
     person = get_user_model().objects.all()
+    serializer = UserListSerializer(person, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def user_detail(request,name):
+    person = User.objects.filter(username=name)
     serializer = UserListSerializer(person, many=True)
     return Response(serializer.data)
