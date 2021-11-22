@@ -7,5 +7,6 @@ urlpatterns = [
     path('<int:user_pk>/follow/', views.follow),
     path('userlist/', views.user_list),
     path('api-token-auth/', obtain_jwt_token),
+    path('<str:name>/',views.user_detail),
     
 ]

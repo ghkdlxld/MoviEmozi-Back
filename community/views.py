@@ -74,10 +74,21 @@ def review_comments_detail(request,review_comment_pk):
     serializer = serializers.ReviewCommentSerializers(comment)
     return Response(serializer.data)
 
-@api_view(['POST'])
+@api_view(['POST','GET'])
 def review_like(request, review_pk):
-    if request.user.is_authenticated:
-        review = get_object_or_404(Review,pk=review_pk)
+    review = get_object_or_404(Review,pk=review_pk)
+    if request.method=='GET':
+        if review.review_like.filter(pk=request.user.pk).exists():
+            like = True
+        else:
+            like = False
+        context = {
+            'count' : review.review_like.count(),
+            'like' : like
+        }
+        return Response(context, status=status.HTTP_200_OK)
+
+    elif request.method=='POST':
         if review.review_like.filter(pk=request.user.pk).exists():
             review.review_like.remove(request.user)
             liked = False
@@ -90,7 +101,6 @@ def review_like(request, review_pk):
             'count':review.review_like.count(),
         }
         return Response(context, status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['GET'])
