@@ -130,6 +130,11 @@ def movie_data_update(request):
                 popularity = data['popularity']
                 runtime = data['runtime']
                 genre_list = data['genres']
+                backdrop_path = data['backdrop_path:']
+                status = data['status']
+                vote_average = data['vote_average:']
+                vote_count = data['vote_count']
+                adult = data['adult']
                 genres = []
                 for genre in genre_list:
                     genres.append(genre['name'])
@@ -143,6 +148,11 @@ def movie_data_update(request):
                     video_id = video_id,
                     genres = genres,
                     runtime = runtime,
+                    backdrop_path = backdrop_path,
+                    status = status,
+                    vote_average = vote_average,
+                    vote_count = vote_count,
+                    adult = adult,
                 )
             else:
                 pass
