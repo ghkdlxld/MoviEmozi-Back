@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from django.db.models.fields import CharField
+from django.db.models.fields import BLANK_CHOICE_DASH, CharField
 
 class Movie(models.Model):
     title = models.CharField(max_length=100)
@@ -12,6 +12,11 @@ class Movie(models.Model):
     genres = models.CharField(max_length=100, blank=True)
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_movies')
     runtime = models.CharField(max_length=50)
+    backdrop_path = models.TextField(blank=True)
+    status= models.TextField(blank=True)
+    vote_average = models.FloatField()
+    vote_count = models.IntegerField()
+    adult = models.BooleanField()
 
     def __str__(self):
         return self.title
