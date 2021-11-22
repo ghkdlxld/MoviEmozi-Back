@@ -77,8 +77,8 @@ def movie_rank(request, movie_pk):
 
 
 @api_view(['PUT','DELETE'])
-def rank_update_delete(request, rank_pk):
-    rank = get_object_or_404(Rank, pk=rank_pk)
+def rank_update_delete(request, user_pk):
+    rank = get_object_or_404(Rank, user=user_pk)
     if request.method == 'PUT':
         serializer = serializers.RankListSerializers(instance=rank, data=request.data)
         if serializer.is_valid(raise_exception=True):
@@ -88,7 +88,7 @@ def rank_update_delete(request, rank_pk):
     elif request.method == 'DELETE':
         rank.delete()
         data = {
-            'delete' : f'평점 {rank_pk} 번이 삭제되었습니다'
+            'delete' : f'{user_pk}님의 평점이 삭제되었습니다'
         }
         return Response(data, status=status.HTTP_204_NO_CONTENT)
 
@@ -97,16 +97,27 @@ def rank_update_delete(request, rank_pk):
 
 
 
-@api_view(['POST'])
+@api_view(['GET', 'POST'])
 def movie_like(request, movie_pk):
     if request.user.is_authenticated:
         movie = get_object_or_404(Movie, pk=movie_pk)
         user = request.user
-        if movie.like_users.filter(pk=user.pk).exists():
-            movie.like_users.remove(user)
+        if request.method == 'GET':
+            user_like_movie = user.like_movies
+            serializer = serializers.MovieListSerializers(user_like_movie, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            movie.like_users.add(user)
-        return Response(status=status.HTTP_200_OK)
+            if movie.like_users.filter(pk=user.pk).exists():
+                movie.like_users.remove(user)
+                liked = False
+            else:
+                movie.like_users.add(user)
+                liked = True
+            context = {
+                'liked' : liked,
+                'like_count' :movie.like_users.count()
+            }
+            return Response(context, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
@@ -130,9 +141,9 @@ def movie_data_update(request):
                 popularity = data['popularity']
                 runtime = data['runtime']
                 genre_list = data['genres']
-                backdrop_path = data['backdrop_path:']
+                backdrop_path = data['backdrop_path']
                 status = data['status']
-                vote_average = data['vote_average:']
+                vote_average = data['vote_average']
                 vote_count = data['vote_count']
                 adult = data['adult']
                 genres = []
