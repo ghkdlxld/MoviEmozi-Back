@@ -6,9 +6,13 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import serializers, status
 from .models import User,HairImage
+from django.views.decorators.http import require_POST
 from rest_framework.renderers import JSONRenderer
-
 from accounts.serializers import UserSerializer, UserListSerializer
+import os
+import sys
+import requests
+
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -63,3 +67,20 @@ def analyze_image(request):
     src = request.FILES['files']
     uploaded_image = HairImage.objects.create(upload_image=src, upload_user=request.user)
     return Response(status=status.HTTP_201_CREATED)
+
+# @api_view(['POST'])
+# @permission_classes([AllowAny])
+@require_POST
+def recommend(request):
+    Client_ID = 'oTXX6kMwz__NOqLgy4dH'
+    Client_Secret = 'L5ot3Ah5zY'
+    api_url = 'https://openapi.naver.com/v1/vision/face'
+    files = {'image': open('123.jpg', 'rb')}
+    headers = {'X-Naver-Client-Id': Client_ID, 'X-Naver-Client-Secret': Client_Secret }
+    response = requests.post(api_url,  files=files, headers=headers)
+    print(response)
+    rescode = response.status_code
+    if(rescode==200):
+        print (response.text)
+    else:
+        print("Error Code:" + rescode)
