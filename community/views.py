@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.http.response import JsonResponse
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from requests.models import to_native_string
@@ -167,3 +168,18 @@ def chat_comments_detail(request,chat_comment_pk):
         return Response(data,status=status.HTTP_204_NO_CONTENT)
     serializer = serializers.ChatboardCommentSerializers(comment)
     return Response(serializer.data)
+
+# 해당 유저가 쓴 댓글 조회
+
+@api_view(['GET'])
+def review_comments_list(request,user_pk):
+    comments = Review_comment.objects.filter(user_id=user_pk)
+    serializer = serializers.ReviewCommentSerializers(comments, many=True)
+    
+    return Response(serializer.data,status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def chat_comments_list(request, user_pk):
+    comments = Chatboard_comment.objects.filter(user_id=user_pk)
+    serializer = serializers.ChatboardCommentSerializers(comments, many=True)
+    return Response(serializer.data,status=status.HTTP_200_OK)

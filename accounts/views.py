@@ -1,10 +1,12 @@
 from django.contrib.auth import get_user_model
+from django.http.response import JsonResponse
 from django.shortcuts import get_list_or_404, get_object_or_404, redirect, render
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, renderer_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import serializers, status
-from .models import User
+from .models import User,HairImage
+from rest_framework.renderers import JSONRenderer
 
 from accounts.serializers import UserSerializer, UserListSerializer
 
@@ -23,15 +25,24 @@ def signup(request):
             user.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)
 
+@api_view(['POST'])
 def follow(request, user_pk):
-    if request.user.is_authenticated:
-        person = get_object_or_404(get_user_model(), pk=user_pk)
-        if request.user != person:
-            if person.followers.filter(pk=request.user_pk).exists():
-                person.followers.remove(request.user)
-            else:
-                person.followers.add(request.user)
-    return Response({'error':'인증되지 않은 사용자입니다'}, status=status.HTTP_401_UNAUTHORIZED)
+    person = get_object_or_404(get_user_model(), pk=user_pk)
+    if request.user != person:
+        if person.followers.filter(pk=request.user.pk).exists():
+            person.followers.remove(request.user)
+            followed = False
+        else:
+            person.followers.add(request.user)
+            followed = True
+        context={
+            'followed' : followed,
+            'followers' : [person.followers.all().values()],
+            'followings' : [person.followings.all().values()],
+        }
+        return Response(context,status=status.HTTP_200_OK)
+    return Response({'error':'자기 자신은 팔로우할 수 없습니다.'},status=status.HTTP_406_NOT_ACCEPTABLE)
+    
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -45,3 +56,10 @@ def user_detail(request,name):
     person = User.objects.filter(username=name)
     serializer = UserListSerializer(person, many=True)
     return Response(serializer.data)
+
+@api_view(['POST'])
+@renderer_classes([JSONRenderer,])
+def analyze_image(request):
+    src = request.FILES['files']
+    uploaded_image = HairImage.objects.create(upload_image=src, upload_user=request.user)
+    return Response(status=status.HTTP_201_CREATED)
