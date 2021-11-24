@@ -1,16 +1,17 @@
 from django.contrib.auth import get_user_model
 from django.http.response import JsonResponse
 from django.shortcuts import get_list_or_404, get_object_or_404, redirect, render
+from django.views.decorators.csrf import requires_csrf_token
 from rest_framework.decorators import api_view, permission_classes, renderer_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import serializers, status
 from .models import User,HairImage
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_http_methods
 from rest_framework.renderers import JSONRenderer
 from accounts.serializers import UserSerializer, UserListSerializer
-import os
-import sys
+# import os
+# import sys
 import requests
 
 
@@ -19,9 +20,23 @@ import requests
 def signup(request):
     name = request.data.get('username')
     users = User.objects.all()
+    print(users)
+    client_id = "oTXX6kMwz__NOqLgy4dH"
+    client_secret = "L5ot3Ah5zY"
+    url = "https://openapi.naver.com/v1/vision/face" 
+
+    files = {'image': open('123.jpg', 'rb')}
+    headers = {'X-Naver-Client-Id': client_id, 'X-Naver-Client-Secret': client_secret }
+    response = requests.post(url,  files=files, headers=headers)
+    rescode = response.status_code
+    if(rescode==200):
+        print (response.text)
+    else:
+        print("Error Code:" + rescode)
     if name in users:
         return Response({'error':'이미 존재하는 이름 입니다.'},status=status.HTTP_409_CONFLICT)
     else:
+        print('xxx')
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             user = serializer.save()
@@ -68,19 +83,34 @@ def analyze_image(request):
     uploaded_image = HairImage.objects.create(upload_image=src, upload_user=request.user)
     return Response(status=status.HTTP_201_CREATED)
 
-# @api_view(['POST'])
-# @permission_classes([AllowAny])
-@require_POST
+@api_view(['POST','GET'])
+@permission_classes([AllowAny])
 def recommend(request):
-    Client_ID = 'oTXX6kMwz__NOqLgy4dH'
-    Client_Secret = 'L5ot3Ah5zY'
-    api_url = 'https://openapi.naver.com/v1/vision/face'
+    print('xxx')
+    client_id = "oTXX6kMwz__NOqLgy4dH"
+    client_secret = "L5ot3Ah5zY"
+    url = "https://openapi.naver.com/v1/vision/face" 
+
     files = {'image': open('123.jpg', 'rb')}
-    headers = {'X-Naver-Client-Id': Client_ID, 'X-Naver-Client-Secret': Client_Secret }
-    response = requests.post(api_url,  files=files, headers=headers)
-    print(response)
+    headers = {'X-Naver-Client-Id': client_id, 'X-Naver-Client-Secret': client_secret }
+    response = requests.post(url,  files=files, headers=headers)
     rescode = response.status_code
     if(rescode==200):
         print (response.text)
     else:
         print("Error Code:" + rescode)
+
+
+        # Client_ID = 'xgtnyliv6n'
+        # Client_Secret = 'I0eM3g8ULGxiZPW0d64sAxUp7EaPdNAvkKwbNEO1'
+        # api_url = 'https://naveropenapi.apigw.ntruss.com/vision/v1/face/'
+        # files = {'image': open('1.jpg', 'rb')}
+        # headers = {{'X-NCP-APIGW-API-KEY-ID': Client_ID}, {'X-NCP-APIGW-API-KEY': Client_Secret
+        # # 'Content-Type':'multipart/form-data'
+        # }}
+        # response = requests.post(api_url,  files=files, headers=headers)
+        # rescode = response.status_code
+        # if(rescode==200):
+        #     print (response.text)
+        # else:
+        #     print("Error Code:" + rescode)

@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-r1pysvi#_yuh1fhwmbn7&ff-o6asbvok+8(@22u(v%v8zt&%k(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['openapi.naver.com']
 
 
 # Application definition
