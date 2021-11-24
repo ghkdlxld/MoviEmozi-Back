@@ -9,9 +9,8 @@ urlpatterns = [
     path('<int:user_pk>/follow/', views.follow),
     path('userlist/', views.user_list),
     path('api-token-auth/', obtain_jwt_token),
-    path('<str:name>/',views.user_detail),
     path('upload/',views.analyze_image),
     path('reco/', views.recommend),
-    
+    path('<str:name>/',views.user_detail),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 
