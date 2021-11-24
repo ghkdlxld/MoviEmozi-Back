@@ -30,6 +30,5 @@ urlpatterns = [
 
     # 유저가 쓴 댓글 조회
     path('<int:user_pk>/comment_list_review/',views.review_comments_list),
-    path('<int:user_pk>/comment_list_chat/',views.chat_comments_list)
-
+    path('<int:user_pk>/comment_list_chat/',views.chat_comments_list),
 ]
