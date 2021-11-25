@@ -11,6 +11,7 @@ urlpatterns = [
     path('api-token-auth/', obtain_jwt_token),
     path('upload/',views.analyze_image),
     path('reco/', views.recommend),
+    path('profile/', views.profile_image),
     path('<str:name>/',views.user_detail),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 

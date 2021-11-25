@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, render , get_list_or_404
 import requests
 import json
 import pprint
-
+from django.contrib.auth import get_user_model
 from rest_framework.permissions import AllowAny
 
 from movies import serializers
@@ -92,21 +92,25 @@ def rank_update_delete(request, user_pk):
         }
         return Response(data, status=status.HTTP_204_NO_CONTENT)
 
-
-
+@api_view(['GET'])
+def movie_user(request, username):
+    user = get_user_model().objects.get(username=username)
+    user_like_movie = user.like_movies.all()
+    serializer = serializers.MovieListSerializers(user_like_movie, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 
 @api_view(['GET', 'POST'])
 def movie_like(request, movie_pk):
     if request.user.is_authenticated:
-        movie = get_object_or_404(Movie, pk=movie_pk)
         user = request.user
         if request.method == 'GET':
-            user_like_movie = user.like_movies
+            user_like_movie = user.like_movies.all()
             serializer = serializers.MovieListSerializers(user_like_movie, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
+            movie = get_object_or_404(Movie, pk=movie_pk)
             if movie.like_users.filter(pk=user.pk).exists():
                 movie.like_users.remove(user)
                 liked = False
