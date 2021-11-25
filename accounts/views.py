@@ -26,23 +26,30 @@ def signup(request):
             user.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)
 
-@api_view(['POST'])
+@api_view(['POST','GET'])
 def follow(request, user_pk):
     person = get_object_or_404(get_user_model(), pk=user_pk)
-    if request.user != person:
-        if person.followers.filter(pk=request.user.pk).exists():
-            person.followers.remove(request.user)
-            followed = False
-        else:
-            person.followers.add(request.user)
-            followed = True
+    if request.method=="POST":
+        if request.user != person:
+            if person.followers.filter(pk=request.user.pk).exists():
+                person.followers.remove(request.user)
+                followed = False
+            else:
+                person.followers.add(request.user)
+                followed = True
+            context={
+                'followed' : followed,
+                'followers' : [person.followers.all().values()],
+                'followings' : [person.followings.all().values()],
+            }
+            return Response(context,status=status.HTTP_200_OK)
+        return Response({'error':'자기 자신은 팔로우할 수 없습니다.'},status=status.HTTP_406_NOT_ACCEPTABLE)
+    elif request.method == 'GET':
         context={
-            'followed' : followed,
             'followers' : [person.followers.all().values()],
             'followings' : [person.followings.all().values()],
         }
         return Response(context,status=status.HTTP_200_OK)
-    return Response({'error':'자기 자신은 팔로우할 수 없습니다.'},status=status.HTTP_406_NOT_ACCEPTABLE)
     
 
 @api_view(['GET'])
@@ -73,7 +80,20 @@ def analyze_image(request):
     headers = {'X-Naver-Client-Id': client_id, 'X-Naver-Client-Secret': client_secret }
     response = requests.post(url,  files=files, headers=headers)
     # print(response.text)
-    return Response(status=status.HTTP_201_CREATED)
+    return Response(response.text, status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+@renderer_classes([JSONRenderer,])
+def profile_image(request):
+    src = request.FILES['files']
+    uploaded_image = HairImage.objects.create(upload_image=src, upload_user=request.user)
+    context={
+        'path':[uploaded_image.upload_image.path],
+        'url':[uploaded_image.upload_image.url],
+        'name':[uploaded_image.upload_image.name]
+    }
+    return Response(context,status=status.HTTP_201_CREATED)
+
 
 
 
