@@ -12,6 +12,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework import status
 
+from datetime import datetime
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -78,7 +80,7 @@ def movie_rank(request, movie_pk):
 
 @api_view(['PUT','DELETE'])
 def rank_update_delete(request, user_pk):
-    rank = get_object_or_404(Rank, user=user_pk)
+    rank = Rank.objects.filter(user=user_pk).last()
     if request.method == 'PUT':
         serializer = serializers.RankListSerializers(instance=rank, data=request.data)
         if serializer.is_valid(raise_exception=True):
@@ -173,3 +175,60 @@ def movie_data_update(request):
     return JsonResponse(data)
         
 
+def boxoffice_update(request):
+    KOFIC_API = '4264dfeb35de00f9b3425f81600289c2'
+    TMDB_API = '325094f1219be8e028e6413f560bf212'
+
+    now = datetime.now()    
+    today = int(now.strftime("%Y%m%d"))-7
+
+    boxoffice_url= f"http://kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchWeeklyBoxOfficeList.json?key={KOFIC_API}&targetDt={today}&weekGb=0"
+    boxoffice_movies = requests.get(boxoffice_url).json()
+    movie_list = boxoffice_movies['boxOfficeResult']['weeklyBoxOfficeList']
+
+    box_movie_title = []
+    for movie in movie_list:
+        box_movie_title.append(movie['movieNm'])
+
+
+    for title in box_movie_title:
+    
+        tmdb_url = f'https://api.themoviedb.org/3/search/movie?api_key={TMDB_API}&language=ko-KR&page=1&include_adult=false&query={title}'
+        data = requests.get(tmdb_url).json()
+
+
+        movie_id = data['results'][0]['id']
+        # video Url
+        video_url = f'https://api.themoviedb.org/3/movie/{movie_id}/videos?api_key={TMDB_API}&language=ko-KR'
+        video = requests.get(video_url).json()
+        if video['results']:
+            video_id = video['results'][0]['key']
+        else:
+            video_id = ''
+        
+        # Runtime, status, genre
+        tmdb_url2 = f'https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API}&language=ko-KR'
+        data_2 = requests.get(tmdb_url2).json()
+
+        genre_list = data_2['genres']
+        genres = []
+        for genre in genre_list:
+            genres.append(genre['name'])
+
+        Movie.objects.create(
+            title = data_2['title'],
+            overview = data_2['overview'],
+            release_date = data_2['release_date'],
+            poster_path = data_2['poster_path'],
+            popularity = data_2['popularity'],
+            
+            runtime = data_2['runtime'],
+            video_id = video_id,
+            genres = genres,
+            backdrop_path = data_2['backdrop_path'],
+            status = data_2['status'],
+            vote_average = data_2['vote_average'],
+            vote_count = data_2['vote_count'],
+            adult = data_2['adult']
+            )
+    return JsonResponse(data_2)
