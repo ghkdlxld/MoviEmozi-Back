@@ -123,7 +123,7 @@ def movie_like(request, movie_pk):
 
 
 def movie_data_update(request):
-    TMDB_api_key='325094f1219be8e028e6413f560bf212'
+    TMDB_api_key='xxxxxxxxxxxxxxxxx'
     nums = range(1,10000)
     for num in nums:
         try:
